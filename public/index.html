@@ -16,10 +16,10 @@
     <main class="container">
 
         <header>
-            <h1>⛽ Spritpreise</h1>
+            <h1>Spritpreise</h1>
 
             <p>
-                Finde die günstigsten Tankstellen in deiner Nähe.
+                Finde die günstigsten Tankstellen in deiner Nähe!
             </p>
         </header>
 
@@ -37,9 +37,19 @@
                 <option value="25">25 km</option>
             </select>
 
+            <label for="fuel_type">
+                Spritart
+            </label>
+
+            <select id="fuelType">
+                <option value="benzina">Super E5</option>
+                <option value="e10">Super E10</option>
+                <option value="motorina">Diesel</option>
+            </select>
+
 
             <button id="loadPrices">
-                📍 Spritpreise laden
+                Suchen
             </button>
 
         </section>
@@ -52,7 +62,7 @@
 
             <div class="start-message">
                 Klicke auf
-                <strong>„Spritpreise laden“</strong>,
+                <strong>„Suchen“</strong>,
                 um Tankstellen in deiner Nähe zu finden.
             </div>
 

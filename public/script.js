@@ -7,6 +7,9 @@ const results =
 const radiusSelect =
     document.getElementById("radius");
 
+const fuelTypeSelect =
+    document.getElementById("fuelType");
+
 const locationInfo =
     document.getElementById("locationInfo");
 
@@ -18,6 +21,9 @@ loadButton.addEventListener(
 
 
 function loadStations() {
+
+    const fuelType =
+        fuelTypeSelect.value;
 
     results.innerHTML = `
         <div class="loading">
@@ -142,149 +148,137 @@ function loadStations() {
 function displayStations(stations) {
 
     if (stations.length === 0) {
-
         showError(
             "Keine Tankstellen im gewählten Umkreis gefunden."
         );
-
         return;
     }
 
-
-    const fuelTypes = [
-
-        {
-            key: "benzina",
+    const fuelTypes = {
+        benzina: {
             name: "Super E5",
             icon: "⛽"
         },
 
-        {
-            key: "e10",
+        e10: {
             name: "Super E10",
             icon: "🟢"
         },
 
-        {
-            key: "motorina",
+        motorina: {
             name: "Diesel",
             icon: "🚛"
         }
-    ];
+    };
 
+    const fuelType =
+        fuelTypeSelect.value;
 
-    let html = "";
+    const fuel =
+        fuelTypes[fuelType];
 
+    if (!fuel) {
+        showError(
+            "Unbekannte Spritart."
+        );
+        return;
+    }
 
-    for (const fuel of fuelTypes) {
+    const available =
+        stations
+            .filter(station => {
+                const price =
+                    station[fuelType];
 
-        const available =
-            stations
-                .filter(station => {
-
-                    const price =
-                        station[fuel.key];
-
-                    return (
-                        typeof price === "number" &&
-                        price > 0
-                    );
-                })
-                .sort(
-                    (a, b) =>
-                        a[fuel.key] -
-                        b[fuel.key]
+                return (
+                    typeof price === "number" &&
+                    price > 0
                 );
+            })
+            .sort(
+                (a, b) =>
+                    a[fuelType] -
+                    b[fuelType]
+            );
 
+    if (available.length === 0) {
+        showError(
+            `Keine Preise für ${fuel.name} gefunden.`
+        );
+        return;
+    }
 
-        if (available.length === 0) {
-            continue;
-        }
+    let html = `
+        <section class="fuel-section">
 
+            <h2>
+                ${fuel.icon}
+                ${fuel.name}
+            </h2>
+    `;
+
+    for (const station of available) {
+
+        const price =
+            station[fuelType];
+
+        const distance =
+            typeof station.dist_km === "number"
+                ? station.dist_km.toFixed(1)
+                : "-";
+
+        const openStatus =
+            station.deschis === true
+                ? `<span class="open">
+                    🟢 Geöffnet
+                   </span>`
+                : `<span class="closed">
+                    🔴 Geschlossen
+                   </span>`;
 
         html += `
-            <section class="fuel-section">
+            <div class="station">
 
-                <h2>
-                    ${fuel.icon}
-                    ${fuel.name}
-                </h2>
-        `;
+                <div class="station-info">
 
+                    <span class="station-name">
+                        ${escapeHtml(
+            station.nume ||
+            "Tankstelle"
+        )}
+                    </span>
 
-        for (const station of available) {
+                    <span class="station-brand">
+                        ${escapeHtml(
+            station.brand || ""
+        )}
+                    </span>
 
-            const price =
-                station[fuel.key];
+                    <span class="station-address">
+                        ${escapeHtml(
+            station.adresa || ""
+        )}
+                    </span>
 
+                    <span class="station-distance">
+                        📍 ${distance} km
+                    </span>
 
-            const distance =
-                typeof station.dist_km === "number"
-                    ? station.dist_km.toFixed(1)
-                    : "-";
-
-
-            const openStatus =
-                station.deschis === true
-                    ? `<span class="open">
-                        🟢 Geöffnet
-                       </span>`
-                    : `<span class="closed">
-                        🔴 Geschlossen
-                       </span>`;
-
-
-            html += `
-                <div class="station">
-
-                    <div class="station-info">
-
-                        <span class="station-name">
-                            ${escapeHtml(
-                station.nume ||
-                "Tankstelle"
-            )}
-                        </span>
-
-
-                        <span class="station-brand">
-                            ${escapeHtml(
-                station.brand || ""
-            )}
-                        </span>
-
-
-                        <span class="station-address">
-                            ${escapeHtml(
-                station.adresa || ""
-            )}
-                        </span>
-
-
-                        <span class="station-distance">
-                            📍 ${distance} km
-                        </span>
-
-
-                        ${openStatus}
-
-                    </div>
-
-
-                    <div class="price">
-                        ${price.toFixed(3)} €
-                    </div>
+                    ${openStatus}
 
                 </div>
-            `;
-        }
 
+                <div class="price">
+                    ${price.toFixed(3)} €
+                </div>
 
-        html += `
-            </section>
+            </div>
         `;
     }
 
+    html += `
+        </section>
+    `;
 
     results.innerHTML = html;
 }
