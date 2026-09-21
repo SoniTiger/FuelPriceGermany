@@ -13,11 +13,19 @@ const fuelTypeSelect =
 const locationInfo =
     document.getElementById("locationInfo");
 
+let currentStations = [];
 
 loadButton.addEventListener(
     "click",
     loadStations
 );
+
+fuelTypeSelect.addEventListener("change", () => {
+    if (currentStations.length === 0) {
+        return;
+    }
+    displayStations(currentStations);
+});
 
 
 function loadStations() {
@@ -112,9 +120,9 @@ function loadStations() {
                         "Die API hat keine Tankstellen geliefert."
                     );
                 }
+                currentStations = data.statii;
 
-
-                displayStations(data.statii);
+                displayStations(currentStations);
 
 
             } catch (error) {
