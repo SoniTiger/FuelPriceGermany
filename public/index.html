@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Spritpreise in meiner Nähe</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header>
+            <h1>⛽ Spritpreise</h1>
+
+            <p>
+                Finde die günstigsten Tankstellen in deiner Nähe.
+            </p>
+        </header>
+
+
+        <section class="controls">
+
+            <label for="radius">
+                Suchradius
+            </label>
+
+            <select id="radius">
+                <option value="5">5 km</option>
+                <option value="10" selected>10 km</option>
+                <option value="15">15 km</option>
+                <option value="25">25 km</option>
+            </select>
+
+
+            <button id="loadPrices">
+                📍 Spritpreise laden
+            </button>
+
+        </section>
+
+
+        <section id="locationInfo"></section>
+
+
+        <section id="results">
+
+            <div class="start-message">
+                Klicke auf
+                <strong>„Spritpreise laden“</strong>,
+                um Tankstellen in deiner Nähe zu finden.
+            </div>
+
+        </section>
+
+
+        <footer>
+            Datenquelle:
+            PretCarburant.ro /
+            Tankerkönig / MTS-K
+        </footer>
+
+    </main>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

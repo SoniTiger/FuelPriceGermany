@@ -1,0 +1,262 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: #f3f4f6;
+    color: #222;
+}
+
+.container {
+    width: min(100% - 30px, 900px);
+
+    margin: 30px auto;
+}
+
+
+/* Header */
+
+header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+header h1 {
+    margin-bottom: 8px;
+}
+
+header p {
+    color: #666;
+}
+
+
+/* Steuerung */
+
+.controls {
+    background: white;
+
+    padding: 20px;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 2px 10px rgba(0, 0, 0, 0.08);
+
+    display: flex;
+
+    gap: 12px;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+}
+
+.controls label {
+    font-weight: bold;
+}
+
+select {
+    padding: 10px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 8px;
+
+    font-size: 16px;
+}
+
+button {
+    padding: 11px 18px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #111827;
+
+    color: white;
+
+    font-size: 16px;
+
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+
+/* Ergebnisse */
+
+#results {
+    margin-top: 25px;
+}
+
+.start-message,
+.loading,
+.error {
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    box-shadow:
+        0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.error {
+    color: #b91c1c;
+}
+
+
+/* Standort */
+
+#locationInfo {
+    margin-top: 15px;
+
+    color: #666;
+
+    text-align: center;
+}
+
+
+/* Kraftstoff */
+
+.fuel-section {
+    margin-bottom: 25px;
+}
+
+.fuel-section h2 {
+    margin-bottom: 12px;
+}
+
+
+/* Tankstelle */
+
+.station {
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 18px;
+
+    margin-bottom: 10px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 20px;
+
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.station-info {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+.station-name {
+    font-size: 18px;
+
+    font-weight: bold;
+}
+
+.station-brand {
+    color: #555;
+}
+
+.station-address {
+    color: #555;
+}
+
+.station-distance {
+    color: #777;
+
+    font-size: 14px;
+}
+
+.open {
+    color: #15803d;
+
+    font-size: 14px;
+}
+
+.closed {
+    color: #b91c1c;
+
+    font-size: 14px;
+}
+
+
+/* Preis */
+
+.price {
+    font-size: 24px;
+
+    font-weight: bold;
+
+    white-space: nowrap;
+}
+
+
+/* Footer */
+
+footer {
+    text-align: center;
+
+    margin-top: 30px;
+
+    padding: 20px;
+
+    color: #777;
+
+    font-size: 13px;
+}
+
+
+/* Mobil */
+
+@media (max-width: 600px) {
+
+    .container {
+        width: min(100% - 20px, 900px);
+
+        margin-top: 15px;
+    }
+
+    .controls {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    select,
+    button {
+        width: 100%;
+    }
+
+    .station {
+        align-items: flex-start;
+    }
+
+    .price {
+        font-size: 21px;
+    }
+}
