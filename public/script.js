@@ -16,32 +16,34 @@ const sortTypeSelect =
 const locationInfo =
     document.getElementById("locationInfo");
 
+const locationSearch =
+    document.getElementById("locationSearch");
+
+const searchLocationButton =
+    document.getElementById("searchLocation");
+
+
 let currentStations = [];
 
-loadButton.addEventListener(
-    "click",
-    loadStations
-);
 
-fuelTypeSelect.addEventListener("change", () => {
-    if (currentStations.length === 0) {
-        return;
-    }
-    displayStations(currentStations);
-});
+// ========================================
+// MEIN STANDORT
+// ========================================
 
-sortTypeSelect.addEventListener("cahnge", () => {
-    if (currentStations.length === 0) {
-        return;
+loadButton.addEventListener("click", () => {
+
+    const query = locationSearch.value.trim();
+
+    if (query) {
+        searchLocation();
+    } else {
+        loadStations();
     }
-    displayStations(currentStations);
+
 });
 
 
 function loadStations() {
-
-    const fuelType =
-        fuelTypeSelect.value;
 
     results.innerHTML = `
         <div class="loading">
@@ -72,77 +74,16 @@ function loadStations() {
             const lon =
                 position.coords.longitude;
 
-            const radius =
-                radiusSelect.value;
-
 
             locationInfo.innerHTML = `
-                📍 Standort gefunden
-                <br>
-                Suche im Umkreis von ${radius} km
+                📍 Dein aktueller Standort
             `;
 
 
-            results.innerHTML = `
-                <div class="loading">
-                    ⛽ Tankstellen werden geladen...
-                </div>
-            `;
-
-
-            try {
-
-                const url =
-                    `/api/stations?lat=${encodeURIComponent(lat)}` +
-                    `&lon=${encodeURIComponent(lon)}` +
-                    `&radius=${encodeURIComponent(radius)}`;
-
-
-                console.log(
-                    "Anfrage an unseren Server:",
-                    url
-                );
-
-
-                const response =
-                    await fetch(url);
-
-
-                const data =
-                    await response.json();
-
-
-                if (!response.ok) {
-
-                    throw new Error(
-                        data.error ||
-                        "Unbekannter Serverfehler."
-                    );
-                }
-
-
-                if (
-                    data.status !== "ok" ||
-                    !Array.isArray(data.statii)
-                ) {
-
-                    throw new Error(
-                        "Die API hat keine Tankstellen geliefert."
-                    );
-                }
-                currentStations = data.statii;
-
-                displayStations(currentStations);
-
-
-            } catch (error) {
-
-                console.error(error);
-
-                showError(
-                    error.message
-                );
-            }
+            await loadStationsFromCoordinates(
+                lat,
+                lon
+            );
         },
 
 
@@ -163,16 +104,250 @@ function loadStations() {
 }
 
 
-function displayStations(stations) {
 
-    if (stations.length === 0) {
+// ========================================
+// ORT / PLZ SUCHEN
+// ========================================
+
+searchLocationButton.addEventListener(
+    "click",
+    searchLocation
+);
+
+
+async function searchLocation() {
+
+    const query =
+        locationSearch.value.trim();
+
+
+    if (!query) {
+
         showError(
-            "Keine Tankstellen im gewählten Umkreis gefunden."
+            "Bitte einen Ort oder eine PLZ eingeben."
         );
+
         return;
     }
 
+
+    results.innerHTML = `
+        <div class="loading">
+            🔎 Suche nach ${escapeHtml(query)}...
+        </div>
+    `;
+
+
+    locationInfo.innerHTML = "";
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/geocode?query=${encodeURIComponent(query)}`
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                "Ort wurde nicht gefunden."
+            );
+        }
+
+
+        console.log(
+            "Gefundener Ort:",
+            data
+        );
+
+
+        locationInfo.innerHTML = `
+            📍 Tankstellen rund um:
+            <strong>
+                ${escapeHtml(data.name)}
+            </strong>
+        `;
+
+
+        await loadStationsFromCoordinates(
+            data.lat,
+            data.lon
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        showError(
+            error.message
+        );
+    }
+}
+
+
+
+// ========================================
+// TANKSTELLEN ÜBER KOORDINATEN LADEN
+// ========================================
+
+async function loadStationsFromCoordinates(
+    lat,
+    lon
+) {
+
+    const radius =
+        radiusSelect.value;
+
+
+    results.innerHTML = `
+        <div class="loading">
+            ⛽ Tankstellen werden geladen...
+        </div>
+    `;
+
+
+    try {
+
+        const url =
+            `/api/stations` +
+            `?lat=${encodeURIComponent(lat)}` +
+            `&lon=${encodeURIComponent(lon)}` +
+            `&radius=${encodeURIComponent(radius)}`;
+
+
+        console.log(
+            "Anfrage an unseren Server:",
+            url
+        );
+
+
+        const response =
+            await fetch(url);
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                "Unbekannter Serverfehler."
+            );
+        }
+
+
+        if (
+            data.status !== "ok" ||
+            !Array.isArray(data.statii)
+        ) {
+
+            throw new Error(
+                "Die API hat keine Tankstellen geliefert."
+            );
+        }
+
+
+        currentStations =
+            data.statii;
+
+
+        displayStations(
+            currentStations
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        showError(
+            error.message
+        );
+    }
+}
+
+
+
+// ========================================
+// KRAFTSTOFF ÄNDERN
+// ========================================
+
+fuelTypeSelect.addEventListener(
+    "change",
+    () => {
+
+        if (
+            currentStations.length === 0
+        ) {
+            return;
+        }
+
+
+        displayStations(
+            currentStations
+        );
+    }
+);
+
+
+
+// ========================================
+// SORTIERUNG ÄNDERN
+// ========================================
+
+sortTypeSelect.addEventListener(
+    "change",
+    () => {
+
+        if (
+            currentStations.length === 0
+        ) {
+            return;
+        }
+
+
+        displayStations(
+            currentStations
+        );
+    }
+);
+
+
+
+// ========================================
+// TANKSTELLEN ANZEIGEN
+// ========================================
+
+function displayStations(
+    stations
+) {
+
+    if (
+        stations.length === 0
+    ) {
+
+        showError(
+            "Keine Tankstellen im gewählten Umkreis gefunden."
+        );
+
+        return;
+    }
+
+
     const fuelTypes = {
+
         benzina: {
             name: "Super E5",
             icon: "⛽"
@@ -189,78 +364,115 @@ function displayStations(stations) {
         }
     };
 
+
     const fuelType =
         fuelTypeSelect.value;
+
 
     const fuel =
         fuelTypes[fuelType];
 
+
     if (!fuel) {
+
         showError(
             "Unbekannte Spritart."
         );
+
         return;
     }
 
+
+    // Nur Tankstellen mit Preis
     const available =
-        stations.filter(station => {
+        stations.filter(
+            station => {
 
-            const price =
-                station[fuelType];
+                const price =
+                    station[fuelType];
 
-            return (
-                typeof price === "number" &&
-                price > 0
-            );
-        });
+
+                return (
+                    typeof price === "number" &&
+                    price > 0
+                );
+            }
+        );
+
+
+    // ====================================
+    // SORTIERUNG
+    // ====================================
 
     const sortType =
         sortTypeSelect.value;
 
 
-    if (sortType === "priceAsc") {
+    if (
+        sortType === "priceAsc"
+    ) {
 
-        available.sort((a, b) => {
-            return (
-                a[fuelType] -
-                b[fuelType]
-            );
-        });
+        available.sort(
+            (a, b) => {
 
+                return (
+                    a[fuelType] -
+                    b[fuelType]
+                );
+            }
+        );
     }
 
 
-    else if (sortType === "priceDesc") {
+    else if (
+        sortType === "priceDesc"
+    ) {
 
-        available.sort((a, b) => {
-            return (
-                b[fuelType] -
-                a[fuelType]
-            );
-        });
+        available.sort(
+            (a, b) => {
 
+                return (
+                    b[fuelType] -
+                    a[fuelType]
+                );
+            }
+        );
     }
 
 
-    else if (sortType === "distance") {
+    else if (
+        sortType === "distance"
+    ) {
 
-        available.sort((a, b) => {
+        available.sort(
+            (a, b) => {
 
-            return (
-                a.dist_km -
-                b.dist_km
-            );
-
-        });
-
+                return (
+                    a.dist_km -
+                    b.dist_km
+                );
+            }
+        );
     }
 
-    if (available.length === 0) {
+
+
+    if (
+        available.length === 0
+    ) {
+
         showError(
             `Keine Preise für ${fuel.name} gefunden.`
         );
+
         return;
     }
+
+
+
+    // ====================================
+    // HTML ERSTELLEN
+    // ====================================
 
     let html = `
         <section class="fuel-section">
@@ -271,24 +483,38 @@ function displayStations(stations) {
             </h2>
     `;
 
-    for (const station of available) {
+
+
+    for (
+        const station of available
+    ) {
 
         const price =
             station[fuelType];
+
 
         const distance =
             typeof station.dist_km === "number"
                 ? station.dist_km.toFixed(1)
                 : "-";
 
+
         const openStatus =
             station.deschis === true
-                ? `<span class="open">
-                    🟢 Geöffnet
-                   </span>`
-                : `<span class="closed">
-                    🔴 Geschlossen
-                   </span>`;
+
+                ? `
+                    <span class="open">
+                        🟢 Geöffnet
+                    </span>
+                  `
+
+                : `
+                    <span class="closed">
+                        🔴 Geschlossen
+                    </span>
+                  `;
+
+
 
         html += `
             <div class="station">
@@ -302,25 +528,32 @@ function displayStations(stations) {
         )}
                     </span>
 
+
                     <span class="station-brand">
                         ${escapeHtml(
-            station.brand || ""
+            station.brand ||
+            ""
         )}
                     </span>
 
+
                     <span class="station-address">
                         ${escapeHtml(
-            station.adresa || ""
+            station.adresa ||
+            ""
         )}
                     </span>
+
 
                     <span class="station-distance">
                         📍 ${distance} km
                     </span>
 
+
                     ${openStatus}
 
                 </div>
+
 
                 <div class="price">
                     ${price.toFixed(3)} €
@@ -330,15 +563,26 @@ function displayStations(stations) {
         `;
     }
 
+
+
     html += `
         </section>
     `;
 
-    results.innerHTML = html;
+
+    results.innerHTML =
+        html;
 }
 
 
-function showError(message) {
+
+// ========================================
+// FEHLER ANZEIGEN
+// ========================================
+
+function showError(
+    message
+) {
 
     results.innerHTML = `
         <div class="error">
@@ -348,7 +592,14 @@ function showError(message) {
 }
 
 
-function escapeHtml(value) {
+
+// ========================================
+// HTML SICHER MACHEN
+// ========================================
+
+function escapeHtml(
+    value
+) {
 
     return String(value)
 

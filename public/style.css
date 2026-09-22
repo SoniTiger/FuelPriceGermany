@@ -72,6 +72,16 @@ select {
     font-size: 16px;
 }
 
+input {
+    padding: 10px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 8px;
+
+    font-size: 16px;
+}
+
 button {
     padding: 11px 18px;
 
