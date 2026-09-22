@@ -10,6 +10,9 @@ const radiusSelect =
 const fuelTypeSelect =
     document.getElementById("fuelType");
 
+const sortTypeSelect =
+    document.getElementById("sortType");
+
 const locationInfo =
     document.getElementById("locationInfo");
 
@@ -21,6 +24,13 @@ loadButton.addEventListener(
 );
 
 fuelTypeSelect.addEventListener("change", () => {
+    if (currentStations.length === 0) {
+        return;
+    }
+    displayStations(currentStations);
+});
+
+sortTypeSelect.addEventListener("cahnge", () => {
     if (currentStations.length === 0) {
         return;
     }
@@ -193,21 +203,57 @@ function displayStations(stations) {
     }
 
     const available =
-        stations
-            .filter(station => {
-                const price =
-                    station[fuelType];
+        stations.filter(station => {
 
-                return (
-                    typeof price === "number" &&
-                    price > 0
-                );
-            })
-            .sort(
-                (a, b) =>
-                    a[fuelType] -
-                    b[fuelType]
+            const price =
+                station[fuelType];
+
+            return (
+                typeof price === "number" &&
+                price > 0
             );
+        });
+
+    const sortType =
+        sortTypeSelect.value;
+
+
+    if (sortType === "priceAsc") {
+
+        available.sort((a, b) => {
+            return (
+                a[fuelType] -
+                b[fuelType]
+            );
+        });
+
+    }
+
+
+    else if (sortType === "priceDesc") {
+
+        available.sort((a, b) => {
+            return (
+                b[fuelType] -
+                a[fuelType]
+            );
+        });
+
+    }
+
+
+    else if (sortType === "distance") {
+
+        available.sort((a, b) => {
+
+            return (
+                a.dist_km -
+                b.dist_km
+            );
+
+        });
+
+    }
 
     if (available.length === 0) {
         showError(
