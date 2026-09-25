@@ -145,7 +145,7 @@ async function searchLocation() {
 
         const response =
             await fetch(
-                `https://fuelprice-api.sonsiri-sotai.workers.dev//api/geocode?query=${encodeURIComponent(query)}`
+                `https://fuelprice-api.sonsiri-sotai.workers.dev/api/geocode?query=${encodeURIComponent(query)}`
             );
 
 
@@ -218,7 +218,7 @@ async function loadStationsFromCoordinates(
     try {
 
         const url =
-            `https://fuelprice-api.sonsiri-sotai.workers.dev//api/stations` +
+            `https://fuelprice-api.sonsiri-sotai.workers.dev/api/stations` +
             `?lat=${encodeURIComponent(lat)}` +
             `&lon=${encodeURIComponent(lon)}` +
             `&radius=${encodeURIComponent(radius)}`;
